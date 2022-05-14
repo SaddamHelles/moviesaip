@@ -18,20 +18,30 @@ import CRUDRequests from "../../API";
 
 function HomeScreen(props) {
   const [moviesList, setMoviesList] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [pageNumber, setPageNumber] = useState(1);
+
   const fetchData = useCallback(async () => {
-    setIsLoading((prevState) => !prevState);
     const response = await CRUDRequests.get(
-      "movie/popular?api_key=e4679f16f5d8829f304a692a39f4c9d1"
+      `/movie/popular?api_key=e4679f16f5d8829f304a692a39f4c9d1&page=${pageNumber}`
     );
-    setIsLoading((prevState) => !prevState);
-    setMoviesList(response.data.results);
-    console.log("Response: ", response);
-  }, []);
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-  return (
+    setMoviesList((prevState) => [...prevState, ...response.data.results]);
+    setIsLoading(false);
+  }, [pageNumber]);
+
+  useEffect(
+    () => {
+      fetchData();
+    },
+    [fetchData],
+    pageNumber
+  );
+  const handleLoadMore = () => {
+    setPageNumber((prevPageNumber) => prevPageNumber + 1);
+  };
+  return isLoading ? (
+    <SpinnerContainer />
+  ) : (
     <FlexColumn>
       <HeroSection
         img={"https://image.tmdb.org/t/p/w500/" + moviesList[0].backdrop_path}
@@ -44,20 +54,18 @@ function HomeScreen(props) {
       <InnerSection>
         <MoviesTitle>Popular Movies</MoviesTitle>
         <CardsContainer>
-          {isLoading ? (
-            <SpinnerContainer />
-          ) : (
-            moviesList.map((item) => (
-              <Card
-                key={item.id}
-                id={Math.random() * 200}
-                name={item.title}
-                img={"https://image.tmdb.org/t/p/w500/" + item.poster_path}
-              />
-            ))
-          )}
+          {moviesList.map((item) => (
+            <Card
+              key={item.id}
+              id={item.id}
+              name={item.title}
+              img={"https://image.tmdb.org/t/p/w500/" + item.poster_path}
+            />
+          ))}
         </CardsContainer>
-        <LoadMore isLoading={false}>Load more...</LoadMore>
+        <LoadMore onClick={handleLoadMore} isLoading={isLoading}>
+          Load more...
+        </LoadMore>
       </InnerSection>
     </FlexColumn>
   );

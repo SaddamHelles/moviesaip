@@ -1,4 +1,9 @@
-import { FlexColumn, InnerSection } from "../../Global.Styles";
+import {
+  FlexColumn,
+  FlexRow,
+  InnerSection,
+  SpinnerContainer,
+} from "../../Global.Styles";
 import {
   CardsContainer,
   HeroSection,
@@ -19,107 +24,101 @@ import {
 } from "./MovieScreen.Styles";
 import ActorCard from "../../Components/ActorCard/ActorCard";
 import { useLocation, useParams } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import CRUDRequests from "../../API";
 
 function MovieScreen(props) {
-  const params = useParams(props);
+  const params = useParams();
+  const [movie, setMovie] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchData = useCallback(async () => {
+    const response = await CRUDRequests.get(
+      `/movie/${params.id}?api_key=e4679f16f5d8829f304a692a39f4c9d1`
+    );
+    setMovie((prevState) => response.data);
+    setIsLoading(false);
+  }, [params.id]);
+  console.log("Movie: ", movie);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
   const location = useLocation();
   console.log(params, location.search);
-  return (
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  return isLoading ? (
+    <SpinnerContainer />
+  ) : (
     <FlexColumn>
       <NavigatorContainer>
         <NavigatorInnerContainer>
           <NavigatorSpan>Back</NavigatorSpan>
-          <NavigatorSpan>/Movie Name</NavigatorSpan>
+          <NavigatorSpan> / {movie.title}</NavigatorSpan>
         </NavigatorInnerContainer>
       </NavigatorContainer>
       <HeroSection
-        img={"http://image.tmdb.org/t/p/w1280/620hnMVLu6RSZW6a5rwO8gqpt0t.jpg"}
+        img={"https://image.tmdb.org/t/p/w500" + movie.backdrop_path}
       >
         <InnerHeroSection>
           <MovieInfoBox>
             <MovieImage
-              src={
-                "http://image.tmdb.org/t/p/w1280//jTswp6KyDYKtvC52GbHagrZbGvD.jpg"
-              }
-              alt={"movie name"}
+              src={"https://image.tmdb.org/t/p/w500" + movie.poster_path}
+              alt={movie.title}
             />
             <MovieDetailsBox>
               <InfoText margin={"0 0 25px"} fontSize={30} fontWeight={700}>
-                Movie Name
+                {movie.title}
               </InfoText>
               <InfoText margin={"0 0 20px"} fontSize={16} fontWeight={700}>
-                Polt
+                {movie.tagline}
               </InfoText>
               <InfoText margin={"0 0 20px"} fontSize={16} fontWeight={500}>
-                Luca and his best friend Alberto experience an unforgettable
-                summer on the Italian Riviera. But all the fun is threatened by
-                a deeply-held secret: they are sea monsters from another world
-                just below the water’s surface.
+                {movie.overview}
               </InfoText>
               <InfoText margin={"0 0 20px"} fontSize={16} fontWeight={700}>
                 IMDB RATING
               </InfoText>
               <ProgressBarContainer>
                 <ProgressBar>
-                  <ProgressBarPercentage width={82} />
+                  <ProgressBarPercentage width={movie.vote_average * 10} />
                 </ProgressBar>
                 <InfoText margin={"0 20px"} fontSize={16} fontWeight={500}>
-                  8.2
+                  {movie.vote_average}
                 </InfoText>
               </ProgressBarContainer>{" "}
               <InfoText margin={"0 0 20px"} fontSize={16} fontWeight={700}>
-                DIRECTOR
+                Tags
               </InfoText>
-              <InfoText margin={"0 0 20px"} fontSize={16} fontWeight={500}>
-                Enrico Casarosa
-              </InfoText>
+              <FlexRow>
+                {movie.genres.map((item) => (
+                  <InfoText
+                    key={item.id}
+                    margin={"5px 10px"}
+                    fontSize={16}
+                    fontWeight={500}
+                  >
+                    {item.name}
+                  </InfoText>
+                ))}
+              </FlexRow>
             </MovieDetailsBox>
           </MovieInfoBox>
         </InnerHeroSection>
       </HeroSection>
       <InnerSection>
-        <MoviesTitle>Actors</MoviesTitle>
+        <MoviesTitle>Production Companies</MoviesTitle>
         <CardsContainer>
-          <ActorCard
-            key={1}
-            id={""}
-            name={"img"}
-            img={
-              "https://image.tmdb.org/t/p/w500//udDclJoHjfjb8Ekgsd4FDteOkCU.jpg"
-            }
-          />
-          <ActorCard
-            key={2}
-            id={""}
-            name={"img"}
-            img={
-              "https://image.tmdb.org/t/p/w500//udDclJoHjfjb8Ekgsd4FDteOkCU.jpg"
-            }
-          />
-          <ActorCard
-            key={3}
-            id={""}
-            name={"img"}
-            img={
-              "https://image.tmdb.org/t/p/w500//udDclJoHjfjb8Ekgsd4FDteOkCU.jpg"
-            }
-          />
-          <ActorCard
-            key={4}
-            id={""}
-            name={"img"}
-            img={
-              "https://image.tmdb.org/t/p/w500//udDclJoHjfjb8Ekgsd4FDteOkCU.jpg"
-            }
-          />
-          <ActorCard
-            key={5}
-            id={""}
-            name={"img"}
-            img={
-              "https://image.tmdb.org/t/p/w500//udDclJoHjfjb8Ekgsd4FDteOkCU.jpg"
-            }
-          />
+          {movie.production_companies.map((company) => (
+            <ActorCard
+              key={company.id}
+              id={company.id}
+              name={company.name}
+              img={"https://image.tmdb.org/t/p/w500/" + company.logo_path}
+            />
+          ))}
         </CardsContainer>
       </InnerSection>
     </FlexColumn>

@@ -7,7 +7,7 @@ function ActorCard({ img, name, id }) {
     <CardContainer as={Link} to={""}>
       <ActorImage src={img} alt={name} />
       <InfoText margin={"20px"} fontSize={16} fontWeight={700}>
-        Actor Name
+        {name}
       </InfoText>
     </CardContainer>
   );
