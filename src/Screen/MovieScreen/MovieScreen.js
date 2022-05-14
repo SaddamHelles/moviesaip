@@ -23,11 +23,12 @@ import {
   ProgressBarPercentage,
 } from "./MovieScreen.Styles";
 import ActorCard from "../../Components/ActorCard/ActorCard";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import CRUDRequests from "../../API";
 
 function MovieScreen(props) {
+  const navigate = useNavigate();
   const params = useParams();
   const [movie, setMovie] = useState({});
   const [isLoading, setIsLoading] = useState(true);
@@ -48,14 +49,13 @@ function MovieScreen(props) {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
   return isLoading ? (
     <SpinnerContainer />
   ) : (
     <FlexColumn>
       <NavigatorContainer>
         <NavigatorInnerContainer>
-          <NavigatorSpan>Back</NavigatorSpan>
+          <NavigatorSpan onClick={() => navigate(-1)}>Back</NavigatorSpan>
           <NavigatorSpan> / {movie.title}</NavigatorSpan>
         </NavigatorInnerContainer>
       </NavigatorContainer>
