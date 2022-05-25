@@ -13,7 +13,8 @@ const Button = styled.button`
   margin: 5px;
 `;
 const Toggle = ({ theme, toggleTheme }) => {
-  return <Button onClick={toggleTheme}>Light</Button>;
+  const currentMode = "Light";
+  return <Button onClick={toggleTheme}>{currentMode}</Button>;
 };
 Toggle.propTypes = {
   theme: string.isRequired,

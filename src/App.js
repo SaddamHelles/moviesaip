@@ -13,19 +13,15 @@ function App() {
   const [theme, themeToggler] = useDarkMode();
   const themeMode = theme === "light" ? lightTheme : darkTheme;
   return (
-    <ThemeProvider theme={themeMode}>
-      <GlobalStyles />
+    <MainContainer>
+      {/* <Toggle theme={theme} toggleTheme={themeToggler} /> */}
+      <Nav />
 
-      <MainContainer>
-        <Toggle theme={theme} toggleTheme={themeToggler} />
-        <Nav />
-
-        <Routes>
-          <Route path={"/"} element={<HomeScreen />} />
-          <Route path={"/movies/:id"} element={<MovieScreen />} />
-        </Routes>
-      </MainContainer>
-    </ThemeProvider>
+      <Routes>
+        <Route path={"/"} element={<HomeScreen />} />
+        <Route path={"/movies/:id"} element={<MovieScreen />} />
+      </Routes>
+    </MainContainer>
   );
 }
 
